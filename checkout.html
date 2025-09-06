@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout - Parking</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+  <div class="checkout-container">
+    <div class="checkout-content animate-fade-in">
+      <div class="checkout-center">
+        <h1>Confirm Your Slot</h1>
+        <p class="slot-display">Selected Slot: <span id="selectedSlot">{{ slot }}</span></p>
+        <a href="{{ url_for('index') }}" class="change-link">← Change Slot</a>
+      </div>
+
+      <div class="checkout-box animate-slide-in">
+        <h2>Payment Summary</h2>
+        <ul>
+          <li>Base Price: ₹55</li>
+          <li>Tax (18% GST): ₹15</li>
+          <li><strong>Total: ₹70</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+<button class="final-pay-btn" id="proceedToPay">Proceed to Pay</button>
+
+<script>
+  const slot = localStorage.getItem("selectedSlot");
+  document.getElementById("selectedSlot").textContent = slot || "None";
+
+  document.getElementById("proceedToPay").addEventListener("click", () => {
+    if (!slot) {
+      alert("No slot selected!");
+      return;
+    }
+    window.location.href = `/qr_payment?slot=${slot}`;
+  });
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Garage Control</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #121212;
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      width: 90vw;
+      max-width: 400px;
+      border-radius: 20px;
+      padding: 30px 20px;
+      box-shadow: 0 0 20px #CCFF00;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .title {
+      font-size: 26px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .slot-display {
+      font-size: 20px;
+      color: #CCFF00;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .controls button {
+      width: 100%;
+      padding: 18px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: #333;
+      color: white;
+      box-shadow: 0 0 10px #CCFF00;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .controls button:hover {
+      background: #CCFF00;
+      color: #121212;
+    }
+
+    .controls button:active {
+      transform: scale(0.97);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title" id="floorTitle">
+      {% if slot.startswith('G') %}
+        Ground Floor - Ramp Access
+      {% elif slot.startswith('A') %}
+        First Floor - Choose Mode
+      {% elif slot.startswith('E') %}
+        Elevator Slot - Choose Mode
+      {% else %}
+        Parking Control
+      {% endif %}
+    </div>
+
+    <div class="slot-display">Slot: {{ slot }}</div>
+
+    <div class="controls" id="controlButtons">
+      {% if slot.startswith('G') %}
+        <button onclick="selectMode('Ramp')">Use Ramp</button>
+      {% elif slot.startswith('A') %}
+        <button onclick="selectMode('Ramp')">Use Ramp</button>
+        <button onclick="selectMode('Elevator')">Use Elevator</button>
+      {% elif slot.startswith('E') %}
+        <button onclick="selectMode('Elevator')">Use Elevator</button>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    const slot = "{{ slot }}";
+
+    function selectMode(mode) {
+      document.getElementById("floorTitle").textContent = `${mode} Selected`;
+
+      fetch(`/send_command?slot=${slot}&mode=${mode}`)
+        .then(res => res.text())
+        .then(msg => {
+          console.log("✅ " + msg);
+          document.getElementById("controlButtons").innerHTML = `
+            <p style="font-size: 22px; color: #CCFF00;">✅ ${mode} Activated</p>
+            <p style="font-size: 18px;">Gate Opening...</p>
+          `;
+        })
+        .catch(err => {
+          console.error(err);
+          alert("❌ Failed to send command.");
+        });
+    }
+  </script>
+</body>
+</html>
