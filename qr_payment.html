@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scan QR to Pay</title>
+  <style>
+    body {
+      background: #121212;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    #qrcode {
+      width: 200px;
+      height: 200px;
+      margin-bottom: 20px;
+    }
+
+    #success {
+      display: none;
+      text-align: center;
+      animation: slideUp 0.8s ease-out forwards;
+    }
+
+    .checkmark-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 5px solid #4CAF50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      animation: popIn 0.4s ease-out forwards;
+    }
+
+    svg {
+      width: 60px;
+      height: 60px;
+    }
+
+    .checkmark {
+      stroke: #4CAF50;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: drawCheck 0.6s ease forwards 0.5s;
+    }
+
+    h2 {
+      color: #4CAF50;
+      margin-top: 20px;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease-out 0.8s forwards;
+    }
+
+    .home-button {
+      margin-top: 30px;
+      padding: 10px 24px;
+      font-size: 1em;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out 1.5s forwards;
+    }
+
+    .home-button:hover {
+      background: #43a047;
+    }
+
+    @keyframes drawCheck {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.3);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(40px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="qr-container">
+    <h2>Scan the QR Code to Pay</h2>
+    <img id="qrcode" src="{{ url_for('static', filename='qr_code.png') }}" alt="QR Code">
+    <p id="waiting">Waiting for transaction...</p>
+  </div>
+
+  <div id="success">
+    <div class="checkmark-circle">
+      <svg viewBox="0 0 52 52">
+        <path class="checkmark" d="M14 27 L22 35 L38 18" />
+      </svg>
+    </div>
+    <h2>Transaction Completed!</h2>
+    <button class="home-button" onclick="window.location.href='/'">Back to Home</button>
+  </div>
+
+<script>
+function pollTransaction() {
+  fetch("/check_payment")
+    .then(res => res.json())
+    .then(data => {
+      if (data.paid) {
+        // STOP polling
+        clearInterval(poller);
+
+        // Show success tick animation
+        document.getElementById("qr-container").style.display = "none";
+        document.getElementById("success").style.display = "block";
+
+        // Redirect to garage control after a delay
+        setTimeout(() => {
+          const slot = data.slot || "G1";
+          window.location.href = `/garage_control?slot=${slot}`;
+        }, 3000); // wait 3s to show animation
+      }
+    });
+}
+
+// Store interval so we can stop it later
+const poller = setInterval(pollTransaction, 1000);
+
+</script>
+
+</body>
+</html>

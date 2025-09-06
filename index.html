@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Car Parking Level 2</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+  <div class="container">
+    <div class="screen" id="welcomeScreen">
+      <h1>Welcome to Car Parking Level 2</h1>
+      <button class="next-button animated" onclick="showFloorSelection()">Next</button>
+    </div>
+
+    <div class="screen hidden" id="floorSelection">
+      <h2>Choose a Floor</h2>
+      <button onclick="showSlots('ground')">Ground Floor</button>
+      <button onclick="showSlots('first')">First Floor</button>
+    </div>
+
+    <div class="screen hidden" id="slotSelection">
+      <h2 id="floorTitle">Choose a Slot</h2>
+      <div class="slots" id="slotContainer"></div>
+      <div class="selection-info hidden" id="selectionInfo">
+        <p>Selected Slot: <span id="selectedSlotText"></span></p>
+        <button class="proceed-button" onclick="goToCheckout()">Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
